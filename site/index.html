@@ -462,8 +462,8 @@ input, select {
     <!-- BOTÃO -->
     <button class="confirmar" onclick="confirmarProduto()">
       Adicionar ao carrinho
-      atualizarCarrinho();
-    </button>
+
+        </button>
 
   </div>
 </div>
@@ -631,6 +631,8 @@ function confirmarProduto() {
   localStorage.setItem("carrinho", JSON.stringify(carrinho));
 
   document.getElementById("popupProduto").style.display = "none";
+
+  atualizarCarrinho();
 
   alert(`Adicionado!\n${preparo} - R$ ${precoFinal.toFixed(2)}`);
 }
