@@ -137,6 +137,12 @@ function finalizar(){
     return;
   }
 
+  const telefoneNumeros = telefone.replace(/\D/g, "");
+  if(telefoneNumeros.length < 10){
+    alert("Digite um telefone válido.");
+    return;
+  }
+
   const endereco = localStorage.getItem("enderecoUsuario");
   const carrinho = JSON.parse(localStorage.getItem("carrinho")) || [];
   const pagamento = document.querySelector('input[name="pagamento"]:checked').value;
@@ -156,6 +162,15 @@ function finalizar(){
       textoItens += `   📝 Obs: ${item.observacao}\n`;
     }
   });
+
+  // 🔥 SALVA NO PERFIL
+  localStorage.setItem("cliente", JSON.stringify({
+    nome: nome,
+    telefone: telefone,
+    email: document.getElementById("emailCliente")
+      ? document.getElementById("emailCliente").value
+      : ""
+  }));
 
   let mensagem =
 `🧾 *PEDIDO CONFIRMADO*
@@ -332,6 +347,48 @@ if (tel) {
     }
   });
 }
+
+["nomeCliente", "telefoneCliente", "emailCliente"].forEach(id => {
+  const input = document.getElementById(id);
+
+  if(input){
+    input.addEventListener("input", () => {
+      const cliente = {
+        nome: document.getElementById("nomeCliente").value,
+        telefone: document.getElementById("telefoneCliente").value,
+        email: document.getElementById("emailCliente").value
+      };
+
+      localStorage.setItem("cliente", JSON.stringify(cliente));
+    });
+  }
+});
+
+window.addEventListener("load", () => {
+  const cliente = JSON.parse(localStorage.getItem("cliente"));
+
+  if(cliente){
+    document.getElementById("nomeCliente").value = cliente.nome || "";
+    document.getElementById("telefoneCliente").value = cliente.telefone || "";
+    document.getElementById("emailCliente").value = cliente.email || "";
+  }
+});
+
+["nomeCliente", "telefoneCliente", "emailCliente"].forEach(id => {
+  const input = document.getElementById(id);
+
+  if(input){
+    input.addEventListener("input", () => {
+      const cliente = {
+        nome: document.getElementById("nomeCliente").value,
+        telefone: document.getElementById("telefoneCliente").value,
+        email: document.getElementById("emailCliente").value
+      };
+
+      localStorage.setItem("cliente", JSON.stringify(cliente));
+    });
+  }
+});
 
 </script>
 
