@@ -27,8 +27,7 @@
   <div class="card-content">
     <div class="title">Pizza + Refri 2L</div>
     <div class="price"> A partir de: R$ 15,00</div>
-
-    <button class="add-btn" onclick="abrirPopup('Pizza + Refri 2L')">
+<button class="add-btn" onclick="abrirPopup('Pizza + Refri 2L')">
   Escolher Esse!
 </button>
   </div>
@@ -62,10 +61,10 @@
   <div id="cart-count">0</div>
 </div>
 
-  <div class="menu-item">
-    <span>👤</span>
-    <p>Perfil</p>
-  </div>
+  <div class="menu-item" onclick="abrirPerfil()">
+  <span>👤</span>
+  <p>Perfil</p>
+</div>
 
 </div>
 
@@ -92,6 +91,8 @@
 
 <div id="popupProduto" class="popup">
   <div class="popup-content">
+
+    <button class="fechar-popup" onclick="fecharPopup()">✕</button>
 
     <h3 id="nomeProduto">Produto</h3>
 
@@ -292,8 +293,6 @@ let produtoAtual = "";
 function abrirPopup(nome) {
   produtoAtual = nome;
 
-  document.getElementById("nomeProduto").innerText = nome;
-
   const popup = document.getElementById("popupProduto");
 
   popup.style.display = "flex";
@@ -301,7 +300,11 @@ function abrirPopup(nome) {
   setTimeout(() => {
     popup.classList.add("active");
   }, 10);
+
+  // 🔥 ESCONDE O MENU
+  document.querySelector(".bottom-menu").style.display = "none";
 }
+
 
 function confirmarProduto(btn) {
 
@@ -362,12 +365,25 @@ function abrirCarrinho() {
 function fecharPopup() {
   const popup = document.getElementById("popupProduto");
 
+  if (!popup) return;
+
   popup.classList.remove("active");
 
   setTimeout(() => {
     popup.style.display = "none";
   }, 300);
+
+  // 🔥 MOSTRA O MENU
+  document.querySelector(".bottom-menu").style.display = "flex";
 }
+
+  const popup = document.getElementById("popupProduto");
+
+  popup.classList.remove("active");
+
+  setTimeout(() => {
+    popup.style.display = "none";
+  }, 300);
 
 function atualizarPreco() {
   let preparo = document.querySelector('input[name="preparo"]:checked').value;
@@ -479,6 +495,11 @@ function animarCarrinho() {
 
 function abrirCarrinho(){
   window.location.href = "carrinho.html";
+}
+
+
+function abrirPerfil(){
+  window.location.href = "perfil.html";
 }
 
 </script>
