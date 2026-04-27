@@ -34,6 +34,10 @@
     </div>
   </div>
 
+  <footer style="text-align: center; padding: 30px 10px 90px 10px; font-size: 12px; color: #888; background: #fafafa; border-top: 1px solid #eee;">
+    © 2026 Casa da Pizza | Desenvolvido por <a href="https://www.instagram.com/thepixeloo/" target="_blank" style="color: #d32f2f; text-decoration: none; font-weight: bold;">@thepixeloo</a>
+  </footer>
+
   <div class="bottom-menu">
 
     <div class="menu-item">
@@ -107,26 +111,11 @@
         <option>3 Queijos</option>
         <option>Marguerita</option>
       </select>
-
-      <div id="boxPreparo">
-        <label>Tipo de preparo:</label>
+      <!-- SEÇÃO DE PREPARO / TAMANHO -->
+      <div id="boxPreparo" style="display: none; margin-top: 15px;">
+        <label>Opção:</label>
         <div class="opcoes-preparo">
-          <label class="opcao-card">
-            <input type="radio" name="preparo" value="Assada" checked>
-            <div class="info">
-              <span class="titulo">Assada</span>
-              <span class="preco positivo">R$ 20,00</span>
-            </div>
-            <div class="radio"></div>
-          </label>
-          <label class="opcao-card">
-            <input type="radio" name="preparo" value="Pré-assada">
-            <div class="info">
-              <span class="titulo">Pré-assada</span>
-              <span class="preco negativo">R$ 15,00</span>
-            </div>
-            <div class="radio"></div>
-          </label>
+          <!-- RENDERIZADO DINAMICAMENTE -->
         </div>
       </div>
 
