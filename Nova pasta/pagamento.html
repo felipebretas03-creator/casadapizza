@@ -1,201 +1,204 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
+
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Pagamento</title>
-<link rel="stylesheet" href="pagamento.css">
-<link rel="icon" href="favicon.png" type="image/png">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Pagamento</title>
+  <link rel="stylesheet" href="pagamento.css">
+  <link rel="icon" href="favicon.png" type="image/png">
 </head>
 
 <body>
 
-<div class="container">
+  <div class="container">
 
-<header class="header">
-  <button onclick="history.back()">←</button>
-  <h2>Confirme seu pedido</h2>
-</header>
+    <header class="header">
+      <button onclick="history.back()">←</button>
+      <h2>Confirme seu pedido</h2>
+    </header>
 
-<!-- SEUS DADOS -->
-<section class="card">
-  <h3>Seus dados</h3>
+    <!-- SEUS DADOS -->
+    <section class="card">
+      <h3>Seus dados</h3>
 
-  <label>Nome completo</label>
-<input type="text" id="nomeCliente" placeholder="Digite seu nome" required>
+      <label>Nome completo</label>
+      <input type="text" id="nomeCliente" placeholder="Digite seu nome" required>
 
-<label>Telefone / WhatsApp</label>
-<input type="tel" id="telefoneCliente" placeholder="(21) 9XXXX-XXXX" required inputmode="numeric">
+      <label>Telefone / WhatsApp</label>
+      <input type="tel" id="telefoneCliente" placeholder="(21) 9XXXX-XXXX" required inputmode="numeric">
 
-<label>Email (opcional)</label>
-<input type="email" id="emailCliente" placeholder="Seu e-mail">
-</section>
+      <label>Email (opcional)</label>
+      <input type="email" id="emailCliente" placeholder="Seu e-mail">
+    </section>
 
-<!-- ENDEREÇO -->
-<section class="card">
-  <h3 id="tituloEndereco">Endereço de Entrega</h3>
-  <p id="endereco">Carregando endereço...</p>
-</section>
+    <!-- ENDEREÇO -->
+    <section class="card">
+      <h3 id="tituloEndereco">Endereço de Entrega</h3>
+      <p id="endereco">Carregando endereço...</p>
+    </section>
 
-<!-- PAGAMENTO -->
-<section class="card">
-  <h3>Pagamento</h3>
+    <!-- PAGAMENTO -->
+    <section class="card">
+      <h3>Pagamento</h3>
 
-  <label class="opcao">
-    <input type="radio" name="pagamento" value="dinheiro" checked onchange="trocoToggle()">
-    💵 Dinheiro
-  </label>
+      <label class="opcao">
+        <input type="radio" name="pagamento" value="dinheiro" checked onchange="trocoToggle()">
+        💵 Dinheiro
+      </label>
 
-  <div id="trocoBox" class="troco-box">
-    <input type="radio" name="pagamento" value="dinheiro" checked onchange="trocoToggle()">
-    <input type="text" id="trocoPara" placeholder="Troco para quanto?" inputmode="numeric">
-    <button type="button" onclick="semTroco()">Não preciso de troco</button>
+      <div id="trocoBox" class="troco-box">
+        <input type="radio" name="pagamento" value="dinheiro" checked onchange="trocoToggle()">
+        <input type="text" id="trocoPara" placeholder="Troco para quanto?" inputmode="numeric">
+        <button type="button" onclick="semTroco()">Não preciso de troco</button>
+      </div>
+
+      <label class="opcao">
+        <input type="radio" name="pagamento" value="cartao" onchange="trocoToggle()">
+        💳 Cartão de crédito / débito
+      </label>
+
+      <label class="opcao">
+        <input type="radio" name="pagamento" value="pix" onchange="pagamentoToggle()">
+        🔷 Pix
+      </label>
+
+      <div id="pixArea" class="pix-area">
+        <div class="pix-box">
+          <span id="pixChave">14224551730</span>
+          <button type="button" id="btnCopiarPix" onclick="copiarPix()">Copiar</button>
+        </div>
+
+        <p class="pix-aviso">
+          Pedro Otávio
+          Banco: Nubank
+          📲 Após finalizar o pedido, envie o comprovante de pagamento pelo WhatsApp.
+        </p>
+      </div>
+    </section>
+
+    <!-- OBSERVAÇÕES -->
+    <section class="card">
+      <h3>Observações</h3>
+      <textarea id="obsPedido" placeholder="Ex: troco, ponto de referência..."></textarea>
+    </section>
+
+    <!-- RESUMO -->
+    <section class="card">
+      <div class="linha">
+        <span>Subtotal</span>
+        <strong id="subtotal">R$ 0,00</strong>
+      </div>
+
+      <div class="linha">
+        <span>Taxa de entrega</span>
+        <strong id="frete-text">R$ 10,00</strong>
+      </div>
+
+      <div class="linha" id="linhaPagamento">
+        <span>Forma de pagamento</span>
+        <strong id="formaPagamento">Dinheiro</strong>
+      </div>
+
+      <div class="linha" id="linhaTroco" style="display:none;">
+        <span>Troco</span>
+        <strong id="infoTroco">—</strong>
+      </div>
+
+      <div class="linha total">
+        <span>Total</span>
+        <strong id="total">R$ 0,00</strong>
+      </div>
+    </section>
+
+    <!-- BOTÃO FINAL -->
+    <button class="btn-finalizar" onclick="finalizar()">Finalizar pedido</button>
+
   </div>
 
-  <label class="opcao">
-    <input type="radio" name="pagamento" value="cartao" onchange="trocoToggle()">
-    💳 Cartão de crédito / débito
-  </label>
+  <script>
+    const carrinho = JSON.parse(localStorage.getItem("carrinho")) || [];
+    const endereco = localStorage.getItem("enderecoUsuario");
 
-    <label class="opcao">
-  <input type="radio" name="pagamento" value="pix" onchange="pagamentoToggle()">
-  🔷 Pix
-</label>
+    let subtotal = carrinho.reduce((s, i) => s + parseFloat(i.preco), 0);
+    const tipoEntrega = localStorage.getItem("tipoEntrega") || "delivery";
+    const frete = tipoEntrega === "retirada" ? 0 : (parseFloat(localStorage.getItem("freteUsuario")) || 10);
 
-<div id="pixArea" class="pix-area">
-  <div class="pix-box">
-    <span id="pixChave">21977305268</span>
-    <button type="button" id="btnCopiarPix" onclick="copiarPix()">Copiar</button>
-  </div>
+    document.getElementById("subtotal").innerText = "R$ " + subtotal.toFixed(2).replace('.', ',');
+    document.getElementById("frete-text").innerText = tipoEntrega === "retirada" ? "Grátis" : ("R$ " + frete.toFixed(2).replace('.', ','));
+    document.getElementById("total").innerText = "R$ " + (subtotal + frete).toFixed(2).replace('.', ',');
 
-  <p class="pix-aviso">
-    📲 Após finalizar o pedido, envie o comprovante de pagamento pelo WhatsApp.
-  </p>
-</div>
-</section>
-
-<!-- OBSERVAÇÕES -->
-<section class="card">
-  <h3>Observações</h3>
-  <textarea id="obsPedido" placeholder="Ex: troco, ponto de referência..."></textarea>
-</section>
-
-<!-- RESUMO -->
-<section class="card">
-  <div class="linha">
-    <span>Subtotal</span>
-    <strong id="subtotal">R$ 0,00</strong>
-  </div>
-
-  <div class="linha">
-    <span>Taxa de entrega</span>
-    <strong id="frete-text">R$ 10,00</strong>
-  </div>
-
-  <div class="linha" id="linhaPagamento">
-  <span>Forma de pagamento</span>
-  <strong id="formaPagamento">Dinheiro</strong>
-</div>
-
-  <div class="linha" id="linhaTroco" style="display:none;">
-  <span>Troco</span>
-  <strong id="infoTroco">—</strong>
-</div>
-
-  <div class="linha total">
-    <span>Total</span>
-    <strong id="total">R$ 0,00</strong>
-  </div>
-</section>
-
-<!-- BOTÃO FINAL -->
-<button class="btn-finalizar" onclick="finalizar()">Finalizar pedido</button>
-
-</div>
-
-<script>
-const carrinho = JSON.parse(localStorage.getItem("carrinho")) || [];
-const endereco = localStorage.getItem("enderecoUsuario");
-
-let subtotal = carrinho.reduce((s, i) => s + parseFloat(i.preco), 0);
-const tipoEntrega = localStorage.getItem("tipoEntrega") || "delivery";
-const frete = tipoEntrega === "retirada" ? 0 : (parseFloat(localStorage.getItem("freteUsuario")) || 10);
-
-document.getElementById("subtotal").innerText = "R$ " + subtotal.toFixed(2).replace('.', ',');
-document.getElementById("frete-text").innerText = tipoEntrega === "retirada" ? "Grátis" : ("R$ " + frete.toFixed(2).replace('.', ','));
-document.getElementById("total").innerText = "R$ " + (subtotal + frete).toFixed(2).replace('.', ',');
-
-if (tipoEntrega === "retirada") {
-  document.getElementById("tituloEndereco").innerText = "Local de Retirada";
-  document.getElementById("endereco").innerText = "Rua Odilio de Medeiros 210 (Chatuba)";
-} else {
-  document.getElementById("tituloEndereco").innerText = "Endereço de Entrega";
-  document.getElementById("endereco").innerText = endereco || "Endereço não encontrado";
-}
-
-function finalizar(){
-
-  const nome = document.getElementById("nomeCliente").value.trim();
-  const telefone = document.getElementById("telefoneCliente").value.trim();
-
-  if(!nome){
-    alert("Por favor, informe seu nome.");
-    return;
-  }
-
-  if(!telefone){
-    alert("Por favor, informe seu telefone.");
-    return;
-  }
-
-  const telefoneNumeros = telefone.replace(/\D/g, "");
-  if(telefoneNumeros.length < 10){
-    alert("Digite um telefone válido.");
-    return;
-  }
-
-  const endereco = localStorage.getItem("enderecoUsuario");
-  const carrinho = JSON.parse(localStorage.getItem("carrinho")) || [];
-  const pagamento = document.querySelector('input[name="pagamento"]:checked').value;
-  const troco = document.getElementById("infoTroco").textContent;
-  const total = document.getElementById("total").textContent;
-
-  const obsPedido = document.getElementById("obsPedido")
-    ? document.getElementById("obsPedido").value
-    : "";
-
-  let textoItens = "";
-
-  carrinho.forEach(item=>{
-    let detalhesItem = item.sabor || "";
-    if (item.preparo) detalhesItem += " • " + item.preparo;
-    textoItens += `• ${item.nome} (${detalhesItem}) - R$ ${item.preco}\n`;
-
-    if(item.observacao){
-      textoItens += `   📝 Obs: ${item.observacao}\n`;
+    if (tipoEntrega === "retirada") {
+      document.getElementById("tituloEndereco").innerText = "Local de Retirada";
+      document.getElementById("endereco").innerText = "Rua Odilio de Medeiros 210 (Chatuba)";
+    } else {
+      document.getElementById("tituloEndereco").innerText = "Endereço de Entrega";
+      document.getElementById("endereco").innerText = endereco || "Endereço não encontrado";
     }
-  });
 
-  // 🔥 SALVA NO PERFIL
-  localStorage.setItem("cliente", JSON.stringify({
-    nome: nome,
-    telefone: telefone,
-    email: document.getElementById("emailCliente")
-      ? document.getElementById("emailCliente").value
-      : ""
-  }));
+    function finalizar() {
 
-  const tipoEntregaMensagem = localStorage.getItem("tipoEntrega") || "delivery";
-  let enderecoMensagem = "";
+      const nome = document.getElementById("nomeCliente").value.trim();
+      const telefone = document.getElementById("telefoneCliente").value.trim();
 
-  if (tipoEntregaMensagem === "retirada") {
-    enderecoMensagem = "🏪 Retirada na Loja: Rua Odilio de Medeiros 210 (Chatuba)";
-  } else {
-    enderecoMensagem = `📍 Endereço de Entrega:\n${endereco}`;
-  }
+      if (!nome) {
+        alert("Por favor, informe seu nome.");
+        return;
+      }
 
-  let mensagem =
-`🧾 *PEDIDO CONFIRMADO*
+      if (!telefone) {
+        alert("Por favor, informe seu telefone.");
+        return;
+      }
+
+      const telefoneNumeros = telefone.replace(/\D/g, "");
+      if (telefoneNumeros.length < 10) {
+        alert("Digite um telefone válido.");
+        return;
+      }
+
+      const endereco = localStorage.getItem("enderecoUsuario");
+      const carrinho = JSON.parse(localStorage.getItem("carrinho")) || [];
+      const pagamento = document.querySelector('input[name="pagamento"]:checked').value;
+      const troco = document.getElementById("infoTroco").textContent;
+      const total = document.getElementById("total").textContent;
+
+      const obsPedido = document.getElementById("obsPedido")
+        ? document.getElementById("obsPedido").value
+        : "";
+
+      let textoItens = "";
+
+      carrinho.forEach(item => {
+        let detalhesItem = item.sabor || "";
+        if (item.preparo) detalhesItem += " • " + item.preparo;
+        textoItens += `• ${item.nome} (${detalhesItem}) - R$ ${item.preco}\n`;
+
+        if (item.observacao) {
+          textoItens += `   📝 Obs: ${item.observacao}\n`;
+        }
+      });
+
+      // 🔥 SALVA NO PERFIL
+      localStorage.setItem("cliente", JSON.stringify({
+        nome: nome,
+        telefone: telefone,
+        email: document.getElementById("emailCliente")
+          ? document.getElementById("emailCliente").value
+          : ""
+      }));
+
+      const tipoEntregaMensagem = localStorage.getItem("tipoEntrega") || "delivery";
+      let enderecoMensagem = "";
+
+      if (tipoEntregaMensagem === "retirada") {
+        enderecoMensagem = "🏪 Retirada na Loja: Rua Odilio de Medeiros 210 (Chatuba)";
+      } else {
+        enderecoMensagem = `📍 Endereço de Entrega:\n${endereco}`;
+      }
+
+      let mensagem =
+        `🧾 *PEDIDO CONFIRMADO*
 
 👤 Cliente: ${nome}
 📞 Telefone: ${telefone}
@@ -205,14 +208,14 @@ ${enderecoMensagem}
 🍕 Itens:
 ${textoItens}`;
 
-  if(obsPedido && obsPedido.trim() !== ""){
-    mensagem += `
+      if (obsPedido && obsPedido.trim() !== "") {
+        mensagem += `
 
 📝 *Observações do pedido*
 ${obsPedido}`;
-  }
+      }
 
-  mensagem += `
+      mensagem += `
 
 💳 Pagamento: ${pagamento}
 💵 Troco: ${troco}
@@ -221,219 +224,220 @@ ${obsPedido}`;
 
 Obrigado pela preferência! 🙏`;
 
-  const numeroWhats = "5521977305268";
-  
-  // Utilizando wa.me para forçar a abertura direto no aplicativo no celular da forma mais automática possível
-  const url = `https://wa.me/${numeroWhats}?text=${encodeURIComponent(mensagem)}`;
+      const numeroWhats = "5521990884136";
 
-  // Esvazia carrinho
-  localStorage.removeItem("carrinho");
+      // Utilizando wa.me para forçar a abertura direto no aplicativo no celular da forma mais automática possível
+      const url = `https://wa.me/${numeroWhats}?text=${encodeURIComponent(mensagem)}`;
 
-  // Redireciona a janela atual primeiro e, no cenário ideal, o WhatsApp é aberto em seguida.
-  window.location.href = url;
-  
-  // Opcional: Volta para o index após um tempo para limpar a tela de pagamento
-  setTimeout(()=>{
-    window.location.replace("index.html");
-  }, 3000);
-}
+      // Esvazia carrinho
+      localStorage.removeItem("carrinho");
 
-function trocoToggle(){
-  const tipo = document.querySelector('input[name="pagamento"]:checked').value;
-  const box = document.getElementById("trocoBox");
-  const linhaTroco = document.getElementById("linhaTroco");
-  const infoTroco = document.getElementById("infoTroco");
+      // Redireciona a janela atual primeiro e, no cenário ideal, o WhatsApp é aberto em seguida.
+      window.location.href = url;
 
-  if(tipo === "dinheiro"){
-    box.classList.add("ativo");
-    linhaTroco.style.display = "flex";
-  } else {
-    box.classList.remove("ativo");
-    linhaTroco.style.display = "none";
-    infoTroco.textContent = "—"; // 👈 limpa corretamente
-  }
-}
-
-function semTroco(){
-  document.getElementById("trocoPara").value = "";
-  document.getElementById("infoTroco").textContent = "Não precisa de troco";
-  document.getElementById("trocoBox").classList.remove("ativo");
-}
-
-document.getElementById("trocoPara").addEventListener("input", (e)=>{
-  document.getElementById("infoTroco").textContent =
-    e.target.value ? `Troco para R$ ${e.target.value}` : "—";
-});
-
-trocoToggle();
-
-function atualizarFormaPagamento(){
-  const tipo = document.querySelector('input[name="pagamento"]:checked').value;
-  const texto = document.getElementById("formaPagamento");
-
-  if(tipo === "dinheiro"){
-    texto.textContent = "Dinheiro";
-  } else if(tipo === "cartao"){
-    texto.textContent = "Cartão de crédito / débito";
-  } else if(tipo === "pix"){
-    texto.textContent = "Pix";
-  }
-}
-
-// chama quando muda
-document.querySelectorAll('input[name="pagamento"]').forEach(radio => {
-  radio.addEventListener("change", atualizarFormaPagamento);
-});
-
-// inicia correto ao carregar
-atualizarFormaPagamento();
-
-function pagamentoToggle(){
-  const tipo = document.querySelector('input[name="pagamento"]:checked').value;
-  const pixBox = document.getElementById("pixBox");
-
-  pixBox.classList.toggle("ativo", tipo === "pix");
-}
-
-document.querySelectorAll('input[name="pagamento"]').forEach(radio=>{
-  radio.addEventListener("change", pagamentoToggle);
-});
-
-function copiarPix(){
-  const chave = document.getElementById("pixChave").innerText;
-  const btn = document.getElementById("btnCopiarPix");
-
-  if (navigator.clipboard && window.isSecureContext) {
-    navigator.clipboard.writeText(chave);
-  } else {
-    // Fallback para quando o HTML for aberto direto da pasta (sem https)
-    const textArea = document.createElement("textarea");
-    textArea.value = chave;
-    textArea.style.position = "fixed";
-    textArea.style.opacity = "0";
-    document.body.appendChild(textArea);
-    textArea.focus();
-    textArea.select();
-    try {
-      document.execCommand("copy");
-    } catch (err) {
-      console.error("Falha ao copiar", err);
+      // Opcional: Volta para o index após um tempo para limpar a tela de pagamento
+      setTimeout(() => {
+        window.location.replace("index.html");
+      }, 3000);
     }
-    document.body.removeChild(textArea);
-  }
 
-  btn.textContent = "Copiado ✓";
-  btn.classList.add("copiado");
+    function trocoToggle() {
+      const tipo = document.querySelector('input[name="pagamento"]:checked').value;
+      const box = document.getElementById("trocoBox");
+      const linhaTroco = document.getElementById("linhaTroco");
+      const infoTroco = document.getElementById("infoTroco");
 
-  setTimeout(()=>{
-    btn.textContent = "Copiar";
-    btn.classList.remove("copiado");
-  }, 2000);
-}
-
-pagamentoToggle();
-
-const trocoInput = document.getElementById("trocoPara");
-
-trocoInput.addEventListener("input", () => {
-  let numeros = trocoInput.value.replace(/\D/g, "");
-
-  if (!numeros) {
-    trocoInput.value = "";
-    document.getElementById("infoTroco").textContent = "—";
-    return;
-  }
-
-  const valor = (parseInt(numeros) / 100).toFixed(2);
-
-  const formatado = "R$ " + valor
-    .replace(".", ",")
-    .replace(/\B(?=(\d{3})+(?!\d))/g, ".");
-
-  trocoInput.value = formatado;
-  document.getElementById("infoTroco").textContent = `Troco para ${formatado}`;
-});
-
-function pagamentoToggle(){
-  const tipo = document.querySelector('input[name="pagamento"]:checked').value;
-  const pixArea = document.getElementById("pixArea");
-
-  if(tipo === "pix"){
-    pixArea.classList.add("ativo");
-  } else {
-    pixArea.classList.remove("ativo");
-  }
-}
-
-pagamentoToggle();
-
-const tel = document.getElementById("telefoneCliente");
-
-if (tel) {
-  tel.addEventListener("input", () => {
-
-    let v = tel.value.replace(/\D/g, "");
-
-    if (v.length > 11) v = v.slice(0,11);
-
-    if (v.length > 6) {
-      tel.value = `(${v.slice(0,2)}) ${v.slice(2,7)}-${v.slice(7)}`;
-    } 
-    else if (v.length > 2) {
-      tel.value = `(${v.slice(0,2)}) ${v.slice(2)}`;
-    } 
-    else if (v.length > 0) {
-      tel.value = `(${v}`;
-    } 
-    else {
-      tel.value = "";
+      if (tipo === "dinheiro") {
+        box.classList.add("ativo");
+        linhaTroco.style.display = "flex";
+      } else {
+        box.classList.remove("ativo");
+        linhaTroco.style.display = "none";
+        infoTroco.textContent = "—"; // 👈 limpa corretamente
+      }
     }
-  });
-}
 
-["nomeCliente", "telefoneCliente", "emailCliente"].forEach(id => {
-  const input = document.getElementById(id);
+    function semTroco() {
+      document.getElementById("trocoPara").value = "";
+      document.getElementById("infoTroco").textContent = "Não precisa de troco";
+      document.getElementById("trocoBox").classList.remove("ativo");
+    }
 
-  if(input){
-    input.addEventListener("input", () => {
-      const cliente = {
-        nome: document.getElementById("nomeCliente").value,
-        telefone: document.getElementById("telefoneCliente").value,
-        email: document.getElementById("emailCliente").value
-      };
-
-      localStorage.setItem("cliente", JSON.stringify(cliente));
+    document.getElementById("trocoPara").addEventListener("input", (e) => {
+      document.getElementById("infoTroco").textContent =
+        e.target.value ? `Troco para R$ ${e.target.value}` : "—";
     });
-  }
-});
 
-window.addEventListener("load", () => {
-  const cliente = JSON.parse(localStorage.getItem("cliente"));
+    trocoToggle();
 
-  if(cliente){
-    document.getElementById("nomeCliente").value = cliente.nome || "";
-    document.getElementById("telefoneCliente").value = cliente.telefone || "";
-    document.getElementById("emailCliente").value = cliente.email || "";
-  }
-});
+    function atualizarFormaPagamento() {
+      const tipo = document.querySelector('input[name="pagamento"]:checked').value;
+      const texto = document.getElementById("formaPagamento");
 
-["nomeCliente", "telefoneCliente", "emailCliente"].forEach(id => {
-  const input = document.getElementById(id);
+      if (tipo === "dinheiro") {
+        texto.textContent = "Dinheiro";
+      } else if (tipo === "cartao") {
+        texto.textContent = "Cartão de crédito / débito";
+      } else if (tipo === "pix") {
+        texto.textContent = "Pix";
+      }
+    }
 
-  if(input){
-    input.addEventListener("input", () => {
-      const cliente = {
-        nome: document.getElementById("nomeCliente").value,
-        telefone: document.getElementById("telefoneCliente").value,
-        email: document.getElementById("emailCliente").value
-      };
-
-      localStorage.setItem("cliente", JSON.stringify(cliente));
+    // chama quando muda
+    document.querySelectorAll('input[name="pagamento"]').forEach(radio => {
+      radio.addEventListener("change", atualizarFormaPagamento);
     });
-  }
-});
 
-</script>
+    // inicia correto ao carregar
+    atualizarFormaPagamento();
+
+    function pagamentoToggle() {
+      const tipo = document.querySelector('input[name="pagamento"]:checked').value;
+      const pixBox = document.getElementById("pixBox");
+
+      pixBox.classList.toggle("ativo", tipo === "pix");
+    }
+
+    document.querySelectorAll('input[name="pagamento"]').forEach(radio => {
+      radio.addEventListener("change", pagamentoToggle);
+    });
+
+    function copiarPix() {
+      const chave = document.getElementById("pixChave").innerText;
+      const btn = document.getElementById("btnCopiarPix");
+
+      if (navigator.clipboard && window.isSecureContext) {
+        navigator.clipboard.writeText(chave);
+      } else {
+        // Fallback para quando o HTML for aberto direto da pasta (sem https)
+        const textArea = document.createElement("textarea");
+        textArea.value = chave;
+        textArea.style.position = "fixed";
+        textArea.style.opacity = "0";
+        document.body.appendChild(textArea);
+        textArea.focus();
+        textArea.select();
+        try {
+          document.execCommand("copy");
+        } catch (err) {
+          console.error("Falha ao copiar", err);
+        }
+        document.body.removeChild(textArea);
+      }
+
+      btn.textContent = "Copiado ✓";
+      btn.classList.add("copiado");
+
+      setTimeout(() => {
+        btn.textContent = "Copiar";
+        btn.classList.remove("copiado");
+      }, 2000);
+    }
+
+    pagamentoToggle();
+
+    const trocoInput = document.getElementById("trocoPara");
+
+    trocoInput.addEventListener("input", () => {
+      let numeros = trocoInput.value.replace(/\D/g, "");
+
+      if (!numeros) {
+        trocoInput.value = "";
+        document.getElementById("infoTroco").textContent = "—";
+        return;
+      }
+
+      const valor = (parseInt(numeros) / 100).toFixed(2);
+
+      const formatado = "R$ " + valor
+        .replace(".", ",")
+        .replace(/\B(?=(\d{3})+(?!\d))/g, ".");
+
+      trocoInput.value = formatado;
+      document.getElementById("infoTroco").textContent = `Troco para ${formatado}`;
+    });
+
+    function pagamentoToggle() {
+      const tipo = document.querySelector('input[name="pagamento"]:checked').value;
+      const pixArea = document.getElementById("pixArea");
+
+      if (tipo === "pix") {
+        pixArea.classList.add("ativo");
+      } else {
+        pixArea.classList.remove("ativo");
+      }
+    }
+
+    pagamentoToggle();
+
+    const tel = document.getElementById("telefoneCliente");
+
+    if (tel) {
+      tel.addEventListener("input", () => {
+
+        let v = tel.value.replace(/\D/g, "");
+
+        if (v.length > 11) v = v.slice(0, 11);
+
+        if (v.length > 6) {
+          tel.value = `(${v.slice(0, 2)}) ${v.slice(2, 7)}-${v.slice(7)}`;
+        }
+        else if (v.length > 2) {
+          tel.value = `(${v.slice(0, 2)}) ${v.slice(2)}`;
+        }
+        else if (v.length > 0) {
+          tel.value = `(${v}`;
+        }
+        else {
+          tel.value = "";
+        }
+      });
+    }
+
+    ["nomeCliente", "telefoneCliente", "emailCliente"].forEach(id => {
+      const input = document.getElementById(id);
+
+      if (input) {
+        input.addEventListener("input", () => {
+          const cliente = {
+            nome: document.getElementById("nomeCliente").value,
+            telefone: document.getElementById("telefoneCliente").value,
+            email: document.getElementById("emailCliente").value
+          };
+
+          localStorage.setItem("cliente", JSON.stringify(cliente));
+        });
+      }
+    });
+
+    window.addEventListener("load", () => {
+      const cliente = JSON.parse(localStorage.getItem("cliente"));
+
+      if (cliente) {
+        document.getElementById("nomeCliente").value = cliente.nome || "";
+        document.getElementById("telefoneCliente").value = cliente.telefone || "";
+        document.getElementById("emailCliente").value = cliente.email || "";
+      }
+    });
+
+    ["nomeCliente", "telefoneCliente", "emailCliente"].forEach(id => {
+      const input = document.getElementById(id);
+
+      if (input) {
+        input.addEventListener("input", () => {
+          const cliente = {
+            nome: document.getElementById("nomeCliente").value,
+            telefone: document.getElementById("telefoneCliente").value,
+            email: document.getElementById("emailCliente").value
+          };
+
+          localStorage.setItem("cliente", JSON.stringify(cliente));
+        });
+      }
+    });
+
+  </script>
 
 </body>
+
 </html>
