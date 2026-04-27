@@ -1,0 +1,646 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Casa da Pizza</title>
+  <link rel="icon" href="favicon.png" type="image/png">
+
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+
+  <div id="locationBox" class="location">📍 Adicionar endereço</div>
+
+  <div class="hero">
+    <img src="hero.jpg.png">
+  </div>
+
+  <div class="section">
+    <h2>🤤 Gostosuras do dia</h2>
+    <div class="cards">
+      <div class="card">
+        <img src="https://images.unsplash.com/photo-1551024601-bec78aea704b" style="height: 120px; object-fit: cover;">
+        <div class="card-content">
+          <div class="title">Bolo de Pote</div>
+          <div class="price"> R$ 12,00</div>
+          <button class="add-btn" onclick="abrirPopup('Bolo de Pote', 12.00)">
+            Escolher Esse!
+          </button>
+        </div>
+      </div>
+      <div class="card">
+        <img src="https://images.unsplash.com/photo-1582716401301-b2407dc7563d"
+          style="height: 120px; object-fit: cover;">
+        <div class="card-content">
+          <div class="title">Brownie Recheado</div>
+          <div class="price"> R$ 8,00</div>
+          <button class="add-btn" onclick="abrirPopup('Brownie Recheado', 8.00)">
+            Escolher Esse!
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+
+  <div class="section">
+    <h2>🍕 Pizzas</h2>
+    <div class="cards">
+      <div class="card">
+
+        <img src="https://images.unsplash.com/photo-1565299624946-b28f40a0ae38">
+
+        <div class="card-content">
+          <div class="title">Pizzas Salgadas</div>
+          <div class="price"> A partir de R$ 15,00</div>
+          <button class="add-btn" onclick="abrirPopup('Pizzas Salgadas', 20.00)">
+            Escolher Esse!
+          </button>
+        </div>
+      </div>
+
+      <div class="card">
+
+        <img src="banannevada.jpg">
+
+        <div class="card-content">
+          <div class="title">Pizzas Doces</div>
+          <div class="price"> R$ 30,00</div>
+          <button class="add-btn" onclick="abrirPopup('Pizzas Doces', 30.00)">
+            Escolher Esse!
+          </button>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <div class="section">
+    <h2>🥟 Salgadinhos</h2>
+    <div class="cards">
+      <div class="card">
+        <img src="https://images.unsplash.com/photo-1551024601-bec78aea704b" style="height: 120px; object-fit: cover;">
+        <div class="card-content">
+          <div class="title">Bolo de Pote</div>
+          <div class="price"> R$ 12,00</div>
+          <button class="add-btn" onclick="abrirPopup('Bolo de Pote', 12.00)">
+            Escolher Esse!
+          </button>
+        </div>
+      </div>
+      <div class="card">
+        <img src="https://images.unsplash.com/photo-1582716401301-b2407dc7563d"
+          style="height: 120px; object-fit: cover;">
+        <div class="card-content">
+          <div class="title">Brownie Recheado</div>
+          <div class="price"> R$ 8,00</div>
+          <button class="add-btn" onclick="abrirPopup('Brownie Recheado', 8.00)">
+            Escolher Esse!
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="bottom-menu">
+
+    <div class="menu-item">
+      <span>🏠</span>
+      <p>Home</p>
+    </div>
+
+    <!-- 🛒 NOVO -->
+    <div class="menu-item cart" onclick="abrirCarrinho()">
+      <span id="cartIcon">🛒</span>
+      <p>Carrinho</p>
+      <div id="cart-count">0</div>
+    </div>
+
+    <div class="menu-item" onclick="abrirPerfil()">
+      <span>👤</span>
+      <p>Perfil</p>
+    </div>
+
+  </div>
+
+  <!-- MODAL -->
+  <div id="modalEndereco" class="modal">
+    <div class="modal-content">
+
+      <h3>📍 Seus endereços</h3>
+      <div id="listaEnderecos"></div>
+
+      <div class="opcao" onclick="mostrarInput()">➕ Digitar endereço</div>
+
+      <div class="endereco-form">
+
+        <input id="rua" placeholder="Rua" />
+        <input id="numero" placeholder="Número" />
+
+        <input id="bairro" placeholder="Bairro" />
+
+        <input id="cidade" placeholder="Cidade" />
+        <input id="estado" placeholder="Estado (UF)" />
+        <input id="cep" placeholder="CEP" />
+
+        <select id="tipoEndereco">
+          <option>Casa</option>
+          <option>Trabalho</option>
+        </select>
+
+        <button class="confirmar" onclick="salvarNovoEndereco()">Salvar</button>
+
+      </div>
+    </div>
+  </div>
+
+  <div id="popupProduto" class="popup">
+    <div class="popup-content">
+
+      <button class="fechar-popup" onclick="fecharPopup()">✕</button>
+
+      <h3 id="nomeProduto">Produto</h3>
+
+      <!-- SABORES Salgados -->
+      <label>Escolha o sabor:</label>
+      <select id="sabor">
+        <option>Mussarela</option>
+        <option>Calabresa</option>
+        <option>Calabresa c/ Cheddar</option>
+        <option>Portuguesa</option>
+        <option>Presunto</option>
+        <option>Frango c/ Catupiry</option>
+        <option>Frango c/ Cheddar</option>
+        <option>Bacon c/ Ovos</option>
+        <option>3 Queijos</option>
+        <option>Marguerita</option>
+      </select>
+
+      <div id="boxPreparo">
+        <label>Tipo de preparo:</label>
+        <div class="opcoes-preparo">
+          <label class="opcao-card">
+            <input type="radio" name="preparo" value="Assada" checked>
+            <div class="info">
+              <span class="titulo">Assada</span>
+              <span class="preco positivo">R$ 20,00</span>
+            </div>
+            <div class="radio"></div>
+          </label>
+          <label class="opcao-card">
+            <input type="radio" name="preparo" value="Pré-assada">
+            <div class="info">
+              <span class="titulo">Pré-assada</span>
+              <span class="preco negativo">R$ 15,00</span>
+            </div>
+            <div class="radio"></div>
+          </label>
+        </div>
+      </div>
+
+      <!-- OBSERVAÇÃO -->
+      <label>Observações:</label>
+      <textarea id="observacao" placeholder="Ex: sem cebola, borda recheada..."></textarea>
+
+      <!-- BOTÃO -->
+      <button class="confirmar" onclick="confirmarProduto(this)">
+        Adicionar ao carrinho
+      </button>
+
+    </div>
+  </div>
+
+  <!-- Toast moderno -->
+  <div id="toast" class="toast"></div>
+
+  <!-- Modal Premium -->
+  <div id="cartModal" class="modal">
+    <div class="modal-content">
+      <h3>🛒 Adicionado ao carrinho!</h3>
+      <p id="modalMessage"></p>
+      <button onclick="closeModal()">Continuar comprando</button>
+    </div>
+  </div>
+
+  <script>
+
+    const locationBox = document.getElementById("locationBox");
+
+    /* ABRIR MODAL */
+    locationBox.onclick = () =>
+      modalEndereco.style.display = "flex";
+
+    function renderizarEnderecos() {
+      listaEnderecos.innerHTML = "";
+
+      getEnderecos().forEach((e, i) => {
+        listaEnderecos.innerHTML += `
+      <div class="endereco-item">
+
+        <div onclick="selecionarEndereco(${i})" class="endereco-info">
+          <strong>${e.tipo}</strong><br>
+          ${e.endereco}
+        </div>    
+      </div>
+    `;
+      });
+    }
+
+    function renderizarEnderecos() {
+      listaEnderecos.innerHTML = "";
+
+      getEnderecos().forEach((e, i) => {
+        listaEnderecos.innerHTML += `
+      <div class="endereco-item">
+
+        <div onclick="selecionarEndereco(${i})" class="endereco-info">
+          <strong>${e.tipo}</strong><br>
+          ${e.endereco}
+        </div>
+
+        <button class="btn-excluir"
+  onclick="excluirEndereco(${i}); return false;">
+          🗑
+        </button>
+
+      </div>
+    `;
+      });
+    }
+
+    /* SALVAR */
+    function salvarNovoEndereco() {
+
+      const rua = document.getElementById("rua").value;
+      const numero = document.getElementById("numero").value;
+      const bairro = document.getElementById("bairro").value;
+      const cidade = document.getElementById("cidade").value.trim();
+
+      // Lógica do frete automático por escrito (Bairro OU Cidade)
+      let frete = 10; // ← Frete Padrão (se não achar)
+      const local = (bairro + " " + cidade).toLowerCase();
+
+      if (local.includes("nilopolis") || local.includes("nilópolis")) {
+        frete = 5.00;
+      } else if (local.includes("chatuba")) {
+        frete = 4.00;
+      } else if (local.includes("mesquita")) {
+        frete = 5.00;
+      }
+
+      const estado = document.getElementById("estado").value;
+      const cep = document.getElementById("cep").value;
+      const tipo = document.getElementById("tipoEndereco").value;
+
+      if (!rua || !numero || !bairro || !cidade) {
+        alert("Preencha os campos obrigatórios!");
+        return;
+      }
+
+      const enderecoCompleto = `${rua}, ${numero} - ${bairro}, ${cidade} - ${estado}, CEP: ${cep}`;
+
+      let lista = JSON.parse(localStorage.getItem("enderecos")) || [];
+
+      lista.push({
+        tipo: tipo,
+        endereco: enderecoCompleto,
+        frete: frete
+      });
+
+      // 🔥 CORREÇÃO AQUI
+      localStorage.setItem("enderecos", JSON.stringify(lista));
+
+      salvarEndereco(enderecoCompleto);
+      localStorage.setItem("freteUsuario", frete);
+
+      renderizarEnderecos();
+
+      document.getElementById("modalEndereco").style.display = "none";
+
+      alert("Endereço salvo!");
+    }
+
+    /* LISTA */
+    function getEnderecos() {
+      return JSON.parse(localStorage.getItem("enderecos")) || [];
+    }
+
+    function renderizarEnderecos() {
+      const lista = getEnderecos();
+      const container = document.getElementById("listaEnderecos");
+
+      container.innerHTML = "";
+
+      lista.forEach((e, i) => {
+        container.innerHTML += `
+      <div class="endereco-item">
+
+        <div class="endereco-info" onclick="selecionarEndereco(${i})">
+          <strong>${e.tipo}</strong><br>
+          ${e.endereco}
+        </div>
+
+        <button class="btn-excluir" onclick="event.stopPropagation(); excluirEndereco(${i})">
+  🗑
+</button>
+
+      </div>
+    `;
+      });
+    }
+
+    function selecionarEndereco(i) {
+      const lista = getEnderecos();
+      const endereco = lista[i].endereco;
+      const frete = lista[i].frete || 10;
+
+      salvarEndereco(endereco);
+      localStorage.setItem("freteUsuario", frete);
+
+      // 🔥 FECHA O MODAL
+      document.getElementById("modalEndereco").style.display = "none";
+    }
+
+    /* INPUT */
+    function mostrarInput() {
+      inputEndereco.style.display = "block";
+      tipoEndereco.style.display = "block";
+    }
+
+    function salvarEndereco(e) {
+      localStorage.setItem("enderecoUsuario", e);
+
+      const locationBox = document.getElementById("locationBox");
+      if (locationBox) {
+        locationBox.innerHTML = "📍 " + e;
+      }
+    }
+
+    /* WHATS */
+    function pedir() {
+      let e = localStorage.getItem("endereco") || "";
+      window.location.href = "https://wa.me/5599999999999?text=" + encodeURIComponent("Pedido\nEndereço: " + e);
+    }
+
+    function adicionarCarrinho(produto) {
+      let carrinho = JSON.parse(localStorage.getItem("carrinho")) || [];
+
+      carrinho.push(produto);
+
+      localStorage.setItem("carrinho", JSON.stringify(carrinho));
+
+      mostrarToast("🛒 Produto adicionado ao carrinho!");
+    }
+
+    let produtoAtual = "";
+    let precoAtual = 0;
+
+    function abrirPopup(nome, preco) {
+      const popup = document.getElementById("popupProduto");
+
+      produtoAtual = nome; // 🔥 ESSENCIAL
+      precoAtual = preco || 20.00;
+
+      const boxPreparo = document.getElementById("boxPreparo");
+      const selectSabor = document.getElementById("sabor");
+
+      const labelSabor = selectSabor.previousElementSibling;
+
+      if (nome === "Pizzas Doces") {
+        boxPreparo.style.display = "none";
+        labelSabor.style.display = "block";
+        selectSabor.style.display = "block";
+        // Insere sabores doces
+        selectSabor.innerHTML = `
+          <option>Banana Nevada</option>
+          <option>Dois amores</option>
+          <option>Brigadeiro</option>
+          <option>Romeu e Julietta</option>
+        `;
+      } else if (nome === "Pizzas Salgadas") {
+        boxPreparo.style.display = "block";
+        labelSabor.style.display = "block";
+        selectSabor.style.display = "block";
+        // Insere sabores salgados
+        selectSabor.innerHTML = `
+          <option>Mussarela</option>
+          <option>Calabresa</option>
+          <option>Calabresa c/ Cheddar</option>
+          <option>Portuguesa</option>
+          <option>Presunto</option>
+          <option>Frango c/ Catupiry</option>
+          <option>Frango c/ Cheddar</option>
+          <option>Bacon c/ Ovos</option>
+          <option>3 Queijos</option>
+          <option>Marguerita</option>
+        `;
+      } else {
+        boxPreparo.style.display = "none";
+        labelSabor.style.display = "none";
+        selectSabor.style.display = "none";
+      }
+
+      popup.style.display = "flex";
+
+      document.getElementById("nomeProduto").innerText = nome;
+
+      setTimeout(() => {
+        popup.classList.add("active");
+      }, 10);
+
+      document.querySelector(".bottom-menu").style.display = "none";
+    }
+
+    function confirmarProduto(btn) {
+
+      const selectSabor = document.getElementById("sabor");
+      const sabor = selectSabor.style.display !== "none" ? selectSabor.value : "";
+      const obs = document.getElementById("observacao").value;
+
+      let preparoFinal = "";
+      let precoFinal = precoAtual;
+
+      if (produtoAtual === "Pizzas Salgadas") {
+        const preparoSelecionado = document.querySelector('input[name="preparo"]:checked');
+        if (preparoSelecionado) {
+          preparoFinal = preparoSelecionado.value;
+          const precoTexto = preparoSelecionado.closest(".opcao-card").querySelector(".preco").innerText;
+          precoFinal = parseFloat(precoTexto.replace("R$", "").replace(",", ".").trim());
+        }
+      }
+
+      let carrinho = JSON.parse(localStorage.getItem("carrinho")) || [];
+
+      carrinho.push({
+        nome: produtoAtual,
+        sabor: sabor,
+        preparo: preparoFinal,
+        observacao: obs,
+        preco: precoFinal,
+        qtd: 1
+      });
+
+      localStorage.setItem("carrinho", JSON.stringify(carrinho));
+
+      animarParaCarrinho(btn);
+      atualizarCarrinho();
+      fecharPopup();
+      mostrarToast("🛒 Adicionado ao carrinho!");
+    }
+
+    function atualizarCarrinho() {
+      let carrinho = JSON.parse(localStorage.getItem("carrinho")) || [];
+      document.getElementById("cart-count").innerText = carrinho.length;
+    }
+
+    /* chama sempre que abrir o site */
+    window.onload = atualizarCarrinho;
+
+    function abrirCarrinho() {
+      let carrinho = JSON.parse(localStorage.getItem("carrinho")) || [];
+
+      if (carrinho.length === 0) {
+        alert("Carrinho vazio 🛒");
+        return;
+      }
+
+      let mensagem = "🛒 Seu pedido:\n\n";
+
+      carrinho.forEach(item => {
+        mensagem += `• ${item.nome} (${item.sabor})\n`;
+      });
+
+      alert(mensagem);
+    }
+
+    function fecharPopup() {
+      const popup = document.getElementById("popupProduto");
+
+      if (!popup) return;
+
+      popup.classList.remove("active");
+
+      setTimeout(() => {
+        popup.style.display = "none";
+      }, 300);
+
+      document.querySelector(".bottom-menu").style.display = "flex";
+    }
+
+    // 🔥 MOSTRA O MENU
+    document.querySelector(".bottom-menu").style.display = "flex";
+
+
+    function atualizarPreco() {
+      let preparo = document.querySelector('input[name="preparo"]:checked').value;
+
+      let total = precoBase;
+
+      if (preparo === "Pré-assada") {
+        total -= 5;
+      }
+
+      return total;
+    }
+
+    function addToCart(nome, preco, img) {
+      const observacao = document.getElementById("obsProduto").value;
+
+      const item = {
+        nome,
+        preco,
+        img,
+        observacao
+      };
+
+      let carrinho = JSON.parse(localStorage.getItem("carrinho")) || [];
+      carrinho.push(item);
+      localStorage.setItem("carrinho", JSON.stringify(carrinho));
+    }
+
+    function closeModal() {
+      document.getElementById('cartModal').style.display = 'none';
+    }
+
+    function mostrarToast(msg) {
+      const toast = document.getElementById("toast");
+      toast.innerText = msg;
+      toast.classList.add("show");
+
+      setTimeout(() => {
+        toast.classList.remove("show");
+      }, 2000);
+    }
+
+    function animarParaCarrinho(botao) {
+
+      const cart = document.getElementById("cartIcon").getBoundingClientRect();
+      const rect = botao.getBoundingClientRect();
+
+      const bolinha = document.createElement("div");
+      bolinha.classList.add("fly-item");
+
+      bolinha.style.top = rect.top + "px";
+      bolinha.style.left = rect.left + "px";
+
+      document.body.appendChild(bolinha);
+
+      setTimeout(() => {
+        bolinha.style.top = cart.top + "px";
+        bolinha.style.left = cart.left + "px";
+        bolinha.style.opacity = "0.3";
+        bolinha.style.transform = "scale(0.2)";
+      }, 50);
+
+      setTimeout(() => {
+        bolinha.remove();
+        animarCarrinho();
+      }, 800);
+    }
+
+    function animarCarrinho() {
+      const cart = document.getElementById("cartIcon");
+      cart.style.transform = "scale(1.4)";
+
+      setTimeout(() => {
+        cart.style.transform = "scale(1)";
+      }, 200);
+    }
+
+    function abrirCarrinho() {
+      window.location.href = "carrinho.html";
+    }
+
+
+    function abrirPerfil() {
+      window.location.href = "perfil.html";
+    }
+
+    function excluirEndereco(i) {
+
+      let lista = getEnderecos();
+
+      if (!lista[i]) {
+        console.log("Índice inválido:", i);
+        return;
+      }
+
+      if (confirm("Excluir este endereço?")) {
+        lista.splice(i, 1);
+        localStorage.setItem("enderecos", JSON.stringify(lista));
+
+        renderizarEnderecos();
+
+        alert("Endereço removido!");
+      }
+    }
+
+  </script>
+
+</body>
+
+</html>
