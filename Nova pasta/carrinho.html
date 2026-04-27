@@ -92,6 +92,10 @@
   <button class="pay-btn" onclick="finalizarPedido()">Ir para pagamento</button>
 </div>
 
+<footer style="text-align: center; padding: 30px 10px 100px 10px; font-size: 12px; color: #888; background: #fafafa; border-top: 1px solid #eee;">
+  © 2026 Casa da Pizza | Desenvolvido por <a href="https://www.instagram.com/thepixeloo/" target="_blank" style="color: #d32f2f; text-decoration: none; font-weight: bold;">@thepixeloo</a>
+</footer>
+
 <script>
 let carrinho = JSON.parse(localStorage.getItem("carrinho")) || [];
 
@@ -123,7 +127,7 @@ subtotal += totalItem;
 
         <div>
           <h4>${item.nome}</h4>
-          <p>${item.sabor || ""}${item.preparo ? " • " + item.preparo : ""}</p>
+          <p>${item.sabor || ""}${item.preparo ? " • Opção: " + item.preparo : ""}</p>
 
           ${item.observacao ? `<small>📝 ${item.observacao}</small>` : ""}
 
