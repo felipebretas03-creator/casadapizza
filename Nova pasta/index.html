@@ -12,7 +12,7 @@
 
   <link rel="manifest" href="manifest.json">
   <meta name="theme-color" content="#d32f2f">
-  
+
   <!-- Suporte para iOS (iPhone/iPad) -->
   <link rel="apple-touch-icon" href="favicon.png">
   <meta name="apple-mobile-web-app-capable" content="yes">
@@ -28,90 +28,9 @@
     <img src="hero.jpg.png">
   </div>
 
-  <div class="section">
-    <h2>🤤 Gostosuras do dia</h2>
-    <div class="cards">
-      <div class="card">
-        <img src="https://images.unsplash.com/photo-1551024601-bec78aea704b" style="height: 120px; object-fit: cover;">
-        <div class="card-content">
-          <div class="title">Bolo de Pote</div>
-          <div class="price"> R$ 12,00</div>
-          <button class="add-btn" onclick="abrirPopup('Bolo de Pote', 12.00)">
-            Escolher Esse!
-          </button>
-        </div>
-      </div>
-      <div class="card">
-        <img src="https://images.unsplash.com/photo-1582716401301-b2407dc7563d"
-          style="height: 120px; object-fit: cover;">
-        <div class="card-content">
-          <div class="title">Brownie Recheado</div>
-          <div class="price"> R$ 8,00</div>
-          <button class="add-btn" onclick="abrirPopup('Brownie Recheado', 8.00)">
-            Escolher Esse!
-          </button>
-        </div>
-      </div>
-    </div>
-  </div>
-
-
-  <div class="section">
-    <h2>🍕 Pizzas</h2>
-    <div class="cards">
-      <div class="card">
-
-        <img src="https://images.unsplash.com/photo-1565299624946-b28f40a0ae38">
-
-        <div class="card-content">
-          <div class="title">Pizzas Salgadas</div>
-          <div class="price"> A partir de R$ 15,00</div>
-          <button class="add-btn" onclick="abrirPopup('Pizzas Salgadas', 20.00)">
-            Escolher Esse!
-          </button>
-        </div>
-      </div>
-
-      <div class="card">
-
-        <img src="banannevada.jpg">
-
-        <div class="card-content">
-          <div class="title">Pizzas Doces</div>
-          <div class="price"> R$ 30,00</div>
-          <button class="add-btn" onclick="abrirPopup('Pizzas Doces', 30.00)">
-            Escolher Esse!
-          </button>
-        </div>
-
-      </div>
-    </div>
-  </div>
-
-  <div class="section">
-    <h2>🥟 Salgadinhos</h2>
-    <div class="cards">
-      <div class="card">
-        <img src="https://images.unsplash.com/photo-1551024601-bec78aea704b" style="height: 120px; object-fit: cover;">
-        <div class="card-content">
-          <div class="title">Bolo de Pote</div>
-          <div class="price"> R$ 12,00</div>
-          <button class="add-btn" onclick="abrirPopup('Bolo de Pote', 12.00)">
-            Escolher Esse!
-          </button>
-        </div>
-      </div>
-      <div class="card">
-        <img src="https://images.unsplash.com/photo-1582716401301-b2407dc7563d"
-          style="height: 120px; object-fit: cover;">
-        <div class="card-content">
-          <div class="title">Brownie Recheado</div>
-          <div class="price"> R$ 8,00</div>
-          <button class="add-btn" onclick="abrirPopup('Brownie Recheado', 8.00)">
-            Escolher Esse!
-          </button>
-        </div>
-      </div>
+  <div id="cardapio-container">
+    <div style="text-align: center; padding: 40px; color: #777;">
+      Carregando cardápio... ⏳
     </div>
   </div>
 
@@ -235,6 +154,7 @@
     </div>
   </div>
 
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.3.2/papaparse.min.js"></script>
   <script>
 
     const locationBox = document.getElementById("locationBox");
@@ -407,50 +327,92 @@
 
     let produtoAtual = "";
     let precoAtual = 0;
+    let imgAtual = "";
 
-    function abrirPopup(nome, preco) {
+    function abrirPopup(nome, preco, btn) {
       const popup = document.getElementById("popupProduto");
 
       produtoAtual = nome; // 🔥 ESSENCIAL
       precoAtual = preco || 20.00;
 
-      const boxPreparo = document.getElementById("boxPreparo");
-      const selectSabor = document.getElementById("sabor");
+      imgAtual = "https://images.unsplash.com/photo-1565299624946-b28f40a0ae38"; // fallback
 
+      if (btn && btn.closest) {
+        const card = btn.closest(".card");
+        if (card) {
+          const imgEl = card.querySelector("img");
+          if (imgEl) imgAtual = imgEl.src;
+        }
+      }
+
+      // Garantia extra: procura a imagem pelo nome do produto na tela
+      if (imgAtual === "https://images.unsplash.com/photo-1565299624946-b28f40a0ae38") {
+        const cards = document.querySelectorAll(".card");
+        for (let card of cards) {
+          const titleEl = card.querySelector(".title");
+          if (titleEl && titleEl.innerText.trim() === nome) {
+            const imgEl = card.querySelector("img");
+            if (imgEl) {
+              imgAtual = imgEl.src;
+              break;
+            }
+          }
+        }
+      }
+
+      const boxPreparo = document.getElementById("boxPreparo");
+      const opcoesPreparoDiv = boxPreparo.querySelector(".opcoes-preparo");
+      const selectSabor = document.getElementById("sabor");
       const labelSabor = selectSabor.previousElementSibling;
 
-      if (nome === "Pizzas Doces") {
-        boxPreparo.style.display = "none";
+      // Buscar as informações do produto
+      let produtoInfo = null;
+      if (window.dadosCardapio) {
+        produtoInfo = window.dadosCardapio.find(p => p.Nome === nome);
+      }
+
+      // SABORES
+      const campoSabores = produtoInfo ? (produtoInfo.Sabores || produtoInfo.Sabor) : null;
+      if (campoSabores && campoSabores.trim() !== "") {
         labelSabor.style.display = "block";
         selectSabor.style.display = "block";
-        // Insere sabores doces
-        selectSabor.innerHTML = `
-          <option>Banana Nevada</option>
-          <option>Dois amores</option>
-          <option>Brigadeiro</option>
-          <option>Romeu e Julietta</option>
-        `;
-      } else if (nome === "Pizzas Salgadas") {
-        boxPreparo.style.display = "block";
-        labelSabor.style.display = "block";
-        selectSabor.style.display = "block";
-        // Insere sabores salgados
-        selectSabor.innerHTML = `
-          <option>Mussarela</option>
-          <option>Calabresa</option>
-          <option>Calabresa c/ Cheddar</option>
-          <option>Portuguesa</option>
-          <option>Presunto</option>
-          <option>Frango c/ Catupiry</option>
-          <option>Frango c/ Cheddar</option>
-          <option>Bacon c/ Ovos</option>
-          <option>3 Queijos</option>
-          <option>Marguerita</option>
-        `;
+        const saboresArray = campoSabores.split(",").map(s => s.trim());
+        selectSabor.innerHTML = saboresArray.map(s => `<option value="${s}">${s}</option>`).join("");
       } else {
-        boxPreparo.style.display = "none";
         labelSabor.style.display = "none";
         selectSabor.style.display = "none";
+        selectSabor.innerHTML = "";
+      }
+
+      // TAMANHOS / PREPARO
+      const campoTamanhos = produtoInfo ? (produtoInfo.Tamanhos || produtoInfo.Tamanho) : null;
+      if (campoTamanhos && campoTamanhos.trim() !== "") {
+        boxPreparo.style.display = "block";
+        const tamanhosArray = campoTamanhos.split(",").map(t => t.trim());
+        let htmlTamanhos = "";
+        tamanhosArray.forEach((t, i) => {
+          const partes = t.split(":");
+          if(partes.length === 2) {
+             const nomeTamanho = partes[0].trim();
+             let precoTamanhoStr = partes[1].trim().replace(",", ".");
+             const precoTamanho = parseFloat(precoTamanhoStr);
+             const check = i === 0 ? "checked" : "";
+             htmlTamanhos += `
+              <label class="opcao-card">
+                <input type="radio" name="preparo" value="${nomeTamanho}" data-preco="${precoTamanho}" ${check}>
+                <div class="info">
+                  <span class="titulo">${nomeTamanho}</span>
+                  <span class="preco">R$ ${precoTamanho.toFixed(2).replace('.', ',')}</span>
+                </div>
+                <div class="radio"></div>
+              </label>
+             `;
+          }
+        });
+        opcoesPreparoDiv.innerHTML = htmlTamanhos;
+      } else {
+        boxPreparo.style.display = "none";
+        opcoesPreparoDiv.innerHTML = "";
       }
 
       popup.style.display = "flex";
@@ -473,12 +435,15 @@
       let preparoFinal = "";
       let precoFinal = precoAtual;
 
-      if (produtoAtual === "Pizzas Salgadas") {
+      const boxPreparo = document.getElementById("boxPreparo");
+      if (boxPreparo.style.display !== "none") {
         const preparoSelecionado = document.querySelector('input[name="preparo"]:checked');
         if (preparoSelecionado) {
           preparoFinal = preparoSelecionado.value;
-          const precoTexto = preparoSelecionado.closest(".opcao-card").querySelector(".preco").innerText;
-          precoFinal = parseFloat(precoTexto.replace("R$", "").replace(",", ".").trim());
+          const precoDoPreparo = parseFloat(preparoSelecionado.getAttribute("data-preco"));
+          if(!isNaN(precoDoPreparo)) {
+            precoFinal = precoDoPreparo;
+          }
         }
       }
 
@@ -490,6 +455,7 @@
         preparo: preparoFinal,
         observacao: obs,
         preco: precoFinal,
+        img: imgAtual,
         qtd: 1
       });
 
@@ -506,25 +472,95 @@
       document.getElementById("cart-count").innerText = carrinho.length;
     }
 
-    /* chama sempre que abrir o site */
-    window.onload = atualizarCarrinho;
+    /* carrega produtos e atualiza carrinho ao abrir o site */
+    window.onload = () => {
+      atualizarCarrinho();
+      carregarProdutosDoGoogleSheets();
+    };
 
-    function abrirCarrinho() {
-      let carrinho = JSON.parse(localStorage.getItem("carrinho")) || [];
+    function carregarProdutosDoGoogleSheets() {
+      // LINK DA PLANILHA (CSV Público) - Altere para o link real do Google Sheets do cliente
+      const csvUrl = "https://docs.google.com/spreadsheets/d/e/2PACX-1vR3-PlatauuY_NXOt9iiQRXMpHlF40XM1L44LyIwhad2Lst6NHjFwOAkl46UmfG48dAjyroGzTgJ-JT/pub?output=csv";
 
-      if (carrinho.length === 0) {
-        alert("Carrinho vazio 🛒");
-        return;
-      }
+      Papa.parse(csvUrl, {
+        download: true,
+        header: true,
+        complete: function (results) {
+          const dados = results.data;
+          window.dadosCardapio = dados;
+          renderizarCardapio(dados);
+        },
+        error: function (err) {
+          console.error("Erro ao carregar planilha", err);
+          document.getElementById("cardapio-container").innerHTML = "<div style='padding:20px; text-align:center;'>Erro ao carregar o cardápio. Verifique a planilha.</div>";
+        }
+      });
+    }
 
-      let mensagem = "🛒 Seu pedido:\n\n";
+    function renderizarCardapio(dados) {
+      const container = document.getElementById("cardapio-container");
+      container.innerHTML = "";
 
-      carrinho.forEach(item => {
-        mensagem += `• ${item.nome} (${item.sabor})\n`;
+      // Agrupar produtos por Categoria
+      const categorias = {};
+
+      dados.forEach(item => {
+        if (!item.Categoria || !item.Nome) return; // ignora linhas vazias
+
+        if (!categorias[item.Categoria]) {
+          categorias[item.Categoria] = [];
+        }
+        categorias[item.Categoria].push(item);
       });
 
-      alert(mensagem);
+      // Renderiza as categorias
+      for (const [catName, produtos] of Object.entries(categorias)) {
+        let html = `
+          <div class="section">
+            <h2>${catName}</h2>
+            <div class="cards">
+        `;
+
+        produtos.forEach(prod => {
+          let precoStr = (prod.Preco || "").trim();
+          let precoNum = parseFloat(precoStr.replace(",", "."));
+          let precoFormatado = "";
+
+          if (isNaN(precoNum)) {
+             // Tem texto misturado, ex: "A partir de 15,00"
+             precoFormatado = precoStr; // O card exibe o texto completo
+             // Extrai apenas a parte numérica para a conta (caso não haja tamanhos)
+             const numeros = precoStr.match(/\d+([.,]\d+)?/);
+             precoNum = numeros ? parseFloat(numeros[0].replace(",", ".")) : 0;
+          } else {
+             precoFormatado = "R$ " + precoNum.toFixed(2).replace(".", ",");
+          }
+          let img = prod.Imagem || "hero.jpg.png";
+
+          html += `
+            <div class="card">
+              <img src="${img}" style="height: 120px; object-fit: cover;">
+              <div class="card-content">
+                <div class="title">${prod.Nome}</div>
+                <div class="price">${precoFormatado}</div>
+                <button class="add-btn" onclick="abrirPopup('${prod.Nome}', ${precoNum}, this)">
+                  Escolher Esse!
+                </button>
+              </div>
+            </div>
+          `;
+        });
+
+        html += `
+            </div>
+          </div>
+        `;
+
+        container.innerHTML += html;
+      }
     }
+
+    // Função antiga removida
 
     function fecharPopup() {
       const popup = document.getElementById("popupProduto");
@@ -621,6 +657,19 @@
     }
 
     function abrirCarrinho() {
+      const endereco = localStorage.getItem("enderecoUsuario");
+
+      if (!endereco) {
+        mostrarToast("📍 Adicione um endereço primeiro!");
+
+        // Abre automaticamente o modal de endereço para facilitar
+        setTimeout(() => {
+          document.getElementById("modalEndereco").style.display = "flex";
+        }, 800);
+
+        return;
+      }
+
       window.location.href = "carrinho.html";
     }
 

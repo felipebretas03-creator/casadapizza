@@ -33,7 +33,7 @@
 
 <!-- ENDEREÇO -->
 <section class="card">
-  <h3>Endereço principal</h3>
+  <h3 id="tituloEndereco">Endereço de Entrega</h3>
   <p id="endereco">Carregando endereço...</p>
 </section>
 
@@ -118,12 +118,20 @@ const carrinho = JSON.parse(localStorage.getItem("carrinho")) || [];
 const endereco = localStorage.getItem("enderecoUsuario");
 
 let subtotal = carrinho.reduce((s, i) => s + parseFloat(i.preco), 0);
-const frete = parseFloat(localStorage.getItem("freteUsuario")) || 10;
+const tipoEntrega = localStorage.getItem("tipoEntrega") || "delivery";
+const frete = tipoEntrega === "retirada" ? 0 : (parseFloat(localStorage.getItem("freteUsuario")) || 10);
 
 document.getElementById("subtotal").innerText = "R$ " + subtotal.toFixed(2).replace('.', ',');
-document.getElementById("frete-text").innerText = "R$ " + frete.toFixed(2).replace('.', ',');
+document.getElementById("frete-text").innerText = tipoEntrega === "retirada" ? "Grátis" : ("R$ " + frete.toFixed(2).replace('.', ','));
 document.getElementById("total").innerText = "R$ " + (subtotal + frete).toFixed(2).replace('.', ',');
-document.getElementById("endereco").innerText = endereco || "Endereço não encontrado";
+
+if (tipoEntrega === "retirada") {
+  document.getElementById("tituloEndereco").innerText = "Local de Retirada";
+  document.getElementById("endereco").innerText = "Rua Odilio de Medeiros 210 (Chatuba)";
+} else {
+  document.getElementById("tituloEndereco").innerText = "Endereço de Entrega";
+  document.getElementById("endereco").innerText = endereco || "Endereço não encontrado";
+}
 
 function finalizar(){
 
@@ -177,14 +185,22 @@ function finalizar(){
       : ""
   }));
 
+  const tipoEntregaMensagem = localStorage.getItem("tipoEntrega") || "delivery";
+  let enderecoMensagem = "";
+
+  if (tipoEntregaMensagem === "retirada") {
+    enderecoMensagem = "🏪 Retirada na Loja: Rua Odilio de Medeiros 210 (Chatuba)";
+  } else {
+    enderecoMensagem = `📍 Endereço de Entrega:\n${endereco}`;
+  }
+
   let mensagem =
 `🧾 *PEDIDO CONFIRMADO*
 
 👤 Cliente: ${nome}
 📞 Telefone: ${telefone}
 
-📍 Endereço:
-${endereco}
+${enderecoMensagem}
 
 🍕 Itens:
 ${textoItens}`;
