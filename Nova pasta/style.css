@@ -295,7 +295,7 @@ input, select {
 }
 
 .opcao-card {
-  display: flex;
+  display: flex !important;
   justify-content: space-between;
   align-items: center;
   padding: 14px;
@@ -360,6 +360,31 @@ input, select {
   height: 10px;
   background: #d62828;
   border-radius: 50%;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+}
+
+/* CHECKBOX CUSTOM */
+.checkbox-custom {
+  width: 18px;
+  height: 18px;
+  border: 2px solid #ccc;
+  border-radius: 4px;
+  position: relative;
+}
+
+.opcao-card:has(input:checked) .checkbox-custom {
+  border-color: #d62828;
+}
+
+.opcao-card:has(input:checked) .checkbox-custom::after {
+  content: "";
+  width: 10px;
+  height: 10px;
+  background: #d62828;
+  border-radius: 2px;
   position: absolute;
   top: 50%;
   left: 50%;

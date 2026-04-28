@@ -97,20 +97,13 @@
 
       <h3 id="nomeProduto">Produto</h3>
 
-      <!-- SABORES Salgados -->
-      <label>Escolha o sabor:</label>
-      <select id="sabor">
-        <option>Mussarela</option>
-        <option>Calabresa</option>
-        <option>Calabresa c/ Cheddar</option>
-        <option>Portuguesa</option>
-        <option>Presunto</option>
-        <option>Frango c/ Catupiry</option>
-        <option>Frango c/ Cheddar</option>
-        <option>Bacon c/ Ovos</option>
-        <option>3 Queijos</option>
-        <option>Marguerita</option>
-      </select>
+      <!-- SABORES -->
+      <div id="boxSabores" style="display: none; margin-top: 15px;">
+        <label id="labelSabores">Escolha os sabores (pode selecionar mais de um):</label>
+        <div class="opcoes-preparo" id="containerSabores">
+          <!-- Renderizado dinamicamente -->
+        </div>
+      </div>
       <!-- SEÇÃO DE PREPARO / TAMANHO -->
       <div id="boxPreparo" style="display: none; margin-top: 15px;">
         <label>Opção:</label>
@@ -351,8 +344,8 @@
 
       const boxPreparo = document.getElementById("boxPreparo");
       const opcoesPreparoDiv = boxPreparo.querySelector(".opcoes-preparo");
-      const selectSabor = document.getElementById("sabor");
-      const labelSabor = selectSabor.previousElementSibling;
+      const boxSabores = document.getElementById("boxSabores");
+      const containerSabores = document.getElementById("containerSabores");
 
       // Buscar as informações do produto
       let produtoInfo = null;
@@ -361,16 +354,42 @@
       }
 
       // SABORES
-      const campoSabores = produtoInfo ? (produtoInfo.Sabores || produtoInfo.Sabor) : null;
+      let campoSabores = produtoInfo ? (produtoInfo.Sabores || produtoInfo.Sabor) : null;
+      
+      // Fallback para Salgadinhos se não tiver configurado na planilha ainda
+      if ((!campoSabores || campoSabores.trim() === "") && produtoInfo && produtoInfo.Categoria && (produtoInfo.Categoria.toLowerCase().includes("salgadinho") || produtoInfo.Categoria.toLowerCase().includes("salgado"))) {
+        campoSabores = "Coxinha, Risólis de Carne, Bolinha de Queijo, Enroladinho de Salsicha, Kibe";
+      }
+
       if (campoSabores && campoSabores.trim() !== "") {
-        labelSabor.style.display = "block";
-        selectSabor.style.display = "block";
+        boxSabores.style.display = "block";
+
+        // Verifica se o produto permite múltiplos sabores através da planilha (coluna "Multiplo" ou "MultiplosSabores" = "Sim")
+        const campoMultiplo = produtoInfo ? (produtoInfo.Multiplo || produtoInfo.MultiplosSabores || "") : "";
+        const permiteMultiplo = campoMultiplo.toString().toLowerCase().trim() === "sim";
+        
+        const tipoInput = permiteMultiplo ? "checkbox" : "radio";
+        const classeCustom = permiteMultiplo ? "checkbox-custom" : "radio";
+        const instrucaoSabor = permiteMultiplo ? "Escolha os sabores (pode selecionar mais de um):" : "Escolha o sabor:";
+        
+        document.getElementById("labelSabores").innerText = instrucaoSabor;
+
         const saboresArray = campoSabores.split(",").map(s => s.trim());
-        selectSabor.innerHTML = saboresArray.map(s => `<option value="${s}">${s}</option>`).join("");
+        containerSabores.innerHTML = saboresArray.map((s, idx) => {
+          const isChecked = (!permiteMultiplo && idx === 0) ? "checked" : "";
+          return `
+          <label class="opcao-card">
+            <input type="${tipoInput}" name="saborSelecionado" value="${s}" ${isChecked}>
+            <div class="info">
+              <span class="titulo">${s}</span>
+            </div>
+            <div class="${classeCustom}"></div>
+          </label>
+          `;
+        }).join("");
       } else {
-        labelSabor.style.display = "none";
-        selectSabor.style.display = "none";
-        selectSabor.innerHTML = "";
+        boxSabores.style.display = "none";
+        containerSabores.innerHTML = "";
       }
 
       // TAMANHOS / PREPARO
@@ -417,8 +436,12 @@
 
     function confirmarProduto(btn) {
 
-      const selectSabor = document.getElementById("sabor");
-      const sabor = selectSabor.style.display !== "none" ? selectSabor.value : "";
+      const boxSabores = document.getElementById("boxSabores");
+      let sabor = "";
+      if (boxSabores.style.display !== "none") {
+        const selecionados = Array.from(document.querySelectorAll('input[name="saborSelecionado"]:checked')).map(el => el.value);
+        sabor = selecionados.join(", ");
+      }
       const obs = document.getElementById("observacao").value;
 
       let preparoFinal = "";
